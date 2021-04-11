@@ -14,7 +14,7 @@
    vpc           : Kubernetes-the-hard-way
    az_a          : eu-west-2a
    aws_access_key: AKIAYJTNKKLCDGYEK24T
-   aws_secret_key: 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
+   aws_secret_key: none
 
   tasks:
     - name: Create a VPC network for cluster
