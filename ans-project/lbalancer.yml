@@ -1,0 +1,29 @@
+
+---
+- name: Create load balancer for k8s controllers
+  hosts: local
+  connection: local
+  gather_facts: false
+  vars:
+   keypair       : aws-key-london
+   instance_type : t2.micro
+   image         : ami-096cb92bb3580c759
+   region        : eu-west-2
+   count         : 3
+   security_group: KubeSecurityGroup
+   vpc           : Kubernetes-the-hard-way
+   az_a          : eu-west-2a
+   aws_access_key: AKIAYJTNKKLCDGYEK24T
+   aws_secret_key: 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
+
+  tasks:
+    - name: Create ELB
+      ec2_elb_lb:
+          name        : "{{ vpc }}"
+          scheme      : 
+
+
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+      register: elb
+  

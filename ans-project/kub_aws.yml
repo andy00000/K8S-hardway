@@ -1,0 +1,181 @@
+
+---
+- name: Create Kubernetis structure on AWS
+  hosts: local
+  connection: local
+  gather_facts: false
+  vars:
+   keypair       : aws-key-london
+   instance_type : t2.micro
+   image         : ami-096cb92bb3580c759  
+   region        : eu-west-2
+   count         : 3
+   security_group: KubeSecurityGroup
+   vpc           : Kubernetes-the-hard-way
+   az_a          : eu-west-2a
+   aws_access_key: AKIAYJTNKKLCDGYEK24T
+   aws_secret_key: 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
+
+  tasks:
+    - name: Create a VPC network for cluster
+      ec2_vpc_net:
+          name        : "{{ vpc }}"
+          cidr_block  : 10.240.0.0/16
+          region      : "{{ region }}"
+          tags        :
+            module    : ec2_vpc_net
+            this      : works
+          tenancy     : default
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+      register: vpcid
+
+#    - name: Debug var vpcid
+#      debug:
+#        var: vpcid 
+
+    - name: Create subnet for K8s cluster controllers in zone a
+      ec2_vpc_subnet:
+          state       : present
+          region      : "{{ region }}"
+          az          : "{{ az_a }}"
+          vpc_id      : "{{ vpcid.vpc.id }}"
+          cidr        : 10.240.0.0/24
+          tags:
+            Name      : cluster_subnet_control
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+      register        : cluster_subnet_control
+
+    - name: Create subnet for K8s cluster workers in zone a
+      ec2_vpc_subnet:
+          state       : present
+          region      : "{{ region }}"
+          az          : "{{ az_a }}"
+          vpc_id      : "{{ vpcid.vpc.id }}"
+          cidr        : 10.240.10.0/24
+          tags:
+            Name      : cluster_subnet_workers
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"  
+      register        : cluster_subnet_workers
+    
+    - name: Fetching internet gateway id
+      ec2_vpc_igw:
+          region      : "{{ region }}"
+          vpc_id      : "{{ vpcid.vpc.id }}"
+          state       : present
+      register        : igw    
+  
+    - name: Create route in default routing table
+      ec2_vpc_route_table:
+          vpc_id      : "{{ vpcid.vpc.id }}"
+          region      : "{{ region }}"
+          tags:
+            Name      : Public
+          subnets:
+            - "{{ cluster_subnet_control.subnet.id }}"
+          routes:
+            - dest       : 0.0.0.0/0
+              gateway_id : "{{ igw.gateway_id }}"
+      register           : public_route_table
+
+    - name: Create a security group with open ports 22, 6443, icmp
+      ec2_group:
+          name        : "{{ security_group }}"
+          description : Security group for Kubernetis cluster nodes with open ports 22, 6443, icmp
+          region      : "{{ region }}"
+          vpc_id      : "{{ vpcid.vpc.id }}"
+          rules:
+            - proto: tcp
+              from_port : 22
+              to_port   : 22
+              cidr_ip   : 0.0.0.0/0 
+            - proto: tcp
+              from_port : 6443
+              to_port   : 6443
+              cidr_ip   : 0.0.0.0/0
+            - proto: tcp
+              from_port : 2379
+              to_port   : 2380
+              cidr_ip   : 0.0.0.0/0
+            - proto: icmp
+              from_port : 8
+              to_port   : -1
+              cidr_ip   : 0.0.0.0/0              
+          rules_egress:
+            - proto: all
+              cidr_ip   : 0.0.0.0/0
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+      register          : sg
+    
+#    - name: Debug security group
+#      debug:
+#        var: sg
+
+#    - name: Allocate Elastic IP
+#      ec2_eip:
+#          region: "{{ region }}"
+#          in_vpc: true
+#          aws_access_key: "{{ aws_access_key }}"
+#          aws_secret_key: "{{ aws_secret_key }}"
+#      register: eip
+
+    - name: Create one management instance in subnet
+      ec2:
+        key_name      : "{{ keypair }}"
+        instance_type : "{{ instance_type }}"
+        image         : "{{ image }}"
+        wait          : true
+        group_id      : "{{ sg.group_id }}"
+        count         : 1
+        region        : "{{ region }}"
+        vpc_subnet_id : "{{ cluster_subnet_control.subnet.id }}"   
+        private_ip    : 10.240.0.200
+        instance_tags :
+            Name        : Manager0
+            Appointment : Cluster Manager
+        assign_public_ip: yes
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+
+    - name: Create three instances for K8s control plane
+      ec2:
+        key_name      : "{{ keypair }}"
+        instance_type : "{{ instance_type }}"
+        image         : "{{ image }}"
+        wait          : true
+        group_id      : "{{ sg.group_id }}"
+        count         : 1
+        region        : "{{ region }}"
+        vpc_subnet_id : "{{ cluster_subnet_control.subnet.id }}"
+        private_ip    : 10.240.0.1{{ item }}
+        instance_tags :
+            Name        : controller-{{ item }}
+            Appointment : K8s_controller
+        assign_public_ip: yes
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      loop: "{{ range(3)|list }}"
+      register: ec2_control
+
+    - name: Create three instances for K8s workers
+      ec2:
+        key_name      : "{{ keypair }}"
+        instance_type : "{{ instance_type }}"
+        image         : "{{ image }}"
+        wait          : true                                   
+        group_id      : "{{ sg.group_id }}"
+        count         : 1
+        region        : "{{ region }}"
+        vpc_subnet_id : "{{ cluster_subnet_control.subnet.id }}"
+        private_ip    : 10.240.0.2{{ item }}
+        instance_tags :
+            Name        : worker-{{ item }}
+            Appointment : K8s_workers
+        assign_public_ip: yes
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      loop: "{{ range(3)|list }}"
+      register: ec2_worker

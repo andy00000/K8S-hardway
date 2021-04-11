@@ -1,0 +1,15 @@
+
+---
+
+- name: K8S encryption config deployment to k8s hosts
+  hosts: control_servers
+  become: yes
+
+  tasks:
+
+    - name: Copy encryption-config.yaml
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/encryption-config.yaml
+        dest : /home/ubuntu/
+
+

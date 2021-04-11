@@ -1,0 +1,17 @@
+
+---
+
+- name: KubeControlPlane configuration files deployment and start to k8s hosts
+  hosts: control_servers
+  become: yes
+
+  tasks:
+    - name: Copy BootstrapKCP.sh
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_cntrl_panel/BootstrapKCP.sh
+        dest : /home/ubuntu/
+
+    - name: Start BootstrapKCP.sh
+      shell: bash BootstrapKCP.sh >> btcpln.log
+
+

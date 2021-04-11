@@ -1,0 +1,38 @@
+
+---
+
+- name: Certificates deployment to k8s hosts
+  hosts: control_servers
+  become: yes
+
+  tasks:
+
+    - name: Copy certificate ca.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/ca.pem
+        dest : /home/ubuntu/
+
+    - name: Copy certificate ca-key.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/ca-key.pem
+        dest : /home/ubuntu/
+
+    - name: Copy certificate kubernetes.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/kubernetes.pem
+        dest : /home/ubuntu/
+
+    - name: Copy certificate kubernetes-key.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/kubernetes-key.pem
+        dest : /home/ubuntu/
+
+    - name: Copy certificate service-account.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/service-account.pem
+        dest : /home/ubuntu/
+
+    - name: Copy certificate service-account-key.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/service-account-key.pem
+        dest : /home/ubuntu/

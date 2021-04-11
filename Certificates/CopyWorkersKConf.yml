@@ -1,0 +1,20 @@
+
+---
+
+- name: K8S configuration files deployment to k8s hosts
+  hosts: workers_servers
+  become: yes
+
+  tasks:
+
+    - name: Copy kube-proxy.kubeconfig
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/kube-proxy.kubeconfig
+        dest : /home/ubuntu/
+
+    - name: Copy intsance.kubeconfig
+      copy: 
+        src  : /home/ubuntu/kubernetes/Certificates/{{ inventory_hostname }}.kubeconfig
+        dest : /home/ubuntu/
+
+

@@ -1,0 +1,17 @@
+
+---
+
+- name: RBAC configuration files deployment and start to k8s host controller-0
+  hosts: controller-0
+  become: yes
+
+  tasks:
+    - name: Copy RBAC.sh
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_cntrl_panel/RBAC.sh
+        dest : /home/ubuntu/
+
+    - name: Start RBAC.sh
+      shell: bash RBAC.sh >> rbac.log
+
+

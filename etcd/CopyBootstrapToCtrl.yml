@@ -1,0 +1,26 @@
+
+---
+
+- name: ETCD configuration files deployment and start to k8s hosts
+  hosts: control_servers
+  become: yes
+
+  tasks:
+    - name: Change hostname
+      shell: hostname {{ inventory_hostname }}
+
+    - name: Change /etc/hostname
+      shell: echo {{ inventory_hostname }} > /etc/hostname
+
+#    - name: Change /etc/hosts
+#      shell: echo 127.0.0.1 {{ inventory_hostname }} > /etc/hosts 
+
+    - name: Copy BootstrapETCDcm.sh
+      copy:
+        src  : /home/ubuntu/kubernetes/etcd/BootstrapETCDcm.sh
+        dest : /home/ubuntu/
+
+    - name: Start BootstrapETCDcm.sh
+      shell: bash BootstrapETCDcm.sh >> btetcd.log
+
+

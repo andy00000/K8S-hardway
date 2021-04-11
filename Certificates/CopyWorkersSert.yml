@@ -1,0 +1,24 @@
+
+---
+
+- name: Certificates deployment to k8s hosts
+  hosts: workers_servers
+  become: yes
+
+  tasks:
+
+    - name: Copy certificate ca.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/ca.pem
+        dest : /home/ubuntu/
+
+    - name: Copy intsance-key.pem
+      copy: 
+        src  : /home/ubuntu/kubernetes/Certificates/{{ inventory_hostname }}-key.pem
+        dest : /home/ubuntu/
+
+    - name: Copy instance.pem
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/{{ inventory_hostname }}.pem
+        dest : /home/ubuntu/
+

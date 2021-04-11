@@ -1,0 +1,24 @@
+
+---
+
+- name: K8S configuration files deployment to k8s hosts
+  hosts: control_servers
+  become: yes
+
+  tasks:
+
+    - name: Copy admin.kubeconfig
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/admin.kubeconfig
+        dest : /home/ubuntu/
+
+    - name: Copy kube-controller-manager.kubeconfig
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/kube-controller-manager.kubeconfig
+        dest : /home/ubuntu/
+
+    - name: Copy kube-scheduler.kubeconfig
+      copy:
+        src  : /home/ubuntu/kubernetes/Certificates/kube-scheduler.kubeconfig
+        dest : /home/ubuntu/
+
