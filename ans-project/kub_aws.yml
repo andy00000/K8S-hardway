@@ -13,8 +13,7 @@
    security_group: KubeSecurityGroup
    vpc           : Kubernetes-the-hard-way
    az_a          : eu-west-2a
-   aws_access_key: AKIAYJTNKKLCDGYEK24T
-   aws_secret_key: none
+   vars_files:   : cred.yml
 
   tasks:
     - name: Create a VPC network for cluster
