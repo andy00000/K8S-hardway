@@ -10,10 +10,10 @@ Doc 2 - Installing the clent tools (bash: InstallClientTools.sh)
 
 Doc 3 - Provisioning Compute Resources (/ans-project/kub_aws.yml - ansible playbook for compute resourses)
 
-Doc 4 - Provisioning a CA and Generating TLS Certificates (Generate - k8scertificates.sh, generate autohosts.txt - /Certificates/addresses.sh 
+Doc 4 - Provisioning a CA and Generating TLS Certificates (Generate - /Certificates/k8scertificates.sh, generate autohosts.txt - /Certificates/addresses.sh 
         distribute - /Certificates/CopyWorkersCert.yml, /Certificates/CopyControllersCert.yml)
 
-Doc 5 - Generating Kubernetes Configuration Files for Authentication (Generate - ClientAuthCert.sh, 
+Doc 5 - Generating Kubernetes Configuration Files for Authentication (Generate - /Certificates/ClientAuthCert.sh, 
         distribute - /Certificates/CopyWorkersKConf.yml, /Certificates/CopyControllersKConf.yml)
 
 Doc 6 - Generating the Data Encryption Config and Key (Genetate - /Certificates/EncKeyGeneration.sh distribute - /Certificates/CopyControllersEkCf.yml)

@@ -4,6 +4,7 @@
   hosts: local
   connection: local
   gather_facts: false
+  vars_files     : cred.yml
   vars:
    keypair       : aws-key-london
    instance_type : t2.micro
@@ -13,7 +14,6 @@
    security_group: KubeSecurityGroup
    vpc           : Kubernetes-the-hard-way
    az_a          : eu-west-2a
-   vars_files:   : cred.yml
 
   tasks:
     - name: Create a VPC network for cluster
@@ -79,10 +79,10 @@
               gateway_id : "{{ igw.gateway_id }}"
       register           : public_route_table
 
-    - name: Create a security group with open ports 22, 6443, icmp
+    - name: Create a security group with open ports 22, 6443, 2379, 2380, icmp
       ec2_group:
           name        : "{{ security_group }}"
-          description : Security group for Kubernetis cluster nodes with open ports 22, 6443, icmp
+          description : Security group for Kubernetis cluster nodes with open ports 22, 6443, 2379, 2380, icmp
           region      : "{{ region }}"
           vpc_id      : "{{ vpcid.vpc.id }}"
           rules:
@@ -109,10 +109,6 @@
           aws_secret_key: "{{ aws_secret_key }}"
       register          : sg
     
-#    - name: Debug security group
-#      debug:
-#        var: sg
-
 #    - name: Allocate Elastic IP
 #      ec2_eip:
 #          region: "{{ region }}"
