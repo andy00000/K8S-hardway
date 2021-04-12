@@ -1,0 +1,4 @@
+/ans-project/cred.yml
+/Certificates/*.pem
+/Certificates/*.csr
+/Certificates/*.json
