@@ -6,5 +6,3 @@ controller-2 ansible_host=3.9.115.195
 worker-0 ansible_host=18.133.235.116
 worker-1 ansible_host=18.130.161.123
 worker-2 ansible_host=3.8.140.198
-[manager_server]
-Manager0 ansible_host=35.178.245.57

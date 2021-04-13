@@ -1,0 +1,20 @@
+---
+- name: Instal nginx and configure frontend load balancer for k8s
+  hosts: Manager0
+  become: yes
+
+  tasks:
+    - name: Copy nginx_install.sh
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_cntrl_panel/nginx_install.sh
+        dest : /home/ubuntu/
+
+    - name: Copy nginx.conf
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_cntrl_panel/nginx.conf
+        dest : /home/ubuntu/
+
+
+    - name: Start nginx_install.sh
+      shell: bash nginx_install.sh >> nginx_balancer.log
+  
