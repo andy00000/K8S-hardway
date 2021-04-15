@@ -2,7 +2,7 @@
 
 #Client Authentication Configs
 
-KUBERNETES_PUBLIC_ADDRESS=$(aws ec2 describe-addresses --query 'Addresses[*].[PublicIp]' --output text)
+KUBERNETES_PUBLIC_ADDRESS=35.178.245.57        #$(aws ec2 describe-addresses --query 'Addresses[*].[PublicIp]' --output text)
 
 echo Part 1 - The kubelet Kubernetes Configuration File
 

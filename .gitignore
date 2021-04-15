@@ -2,3 +2,5 @@
 /Certificates/*.pem
 /Certificates/*.csr
 /Certificates/*.json
+/boot_worker/credentials
+/boot_worker/config

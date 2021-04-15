@@ -29,11 +29,7 @@
           aws_secret_key: "{{ aws_secret_key }}"
       register: vpcid
 
-#    - name: Debug var vpcid
-#      debug:
-#        var: vpcid 
-
-    - name: Create subnet for K8s cluster controllers in zone a
+    - name: Create subnet for K8s cluster in zone a
       ec2_vpc_subnet:
           state       : present
           region      : "{{ region }}"
@@ -46,19 +42,6 @@
           aws_secret_key: "{{ aws_secret_key }}"
       register        : cluster_subnet_control
 
-    - name: Create subnet for K8s cluster workers in zone a
-      ec2_vpc_subnet:
-          state       : present
-          region      : "{{ region }}"
-          az          : "{{ az_a }}"
-          vpc_id      : "{{ vpcid.vpc.id }}"
-          cidr        : 10.240.10.0/24
-          tags:
-            Name      : cluster_subnet_workers
-          aws_access_key: "{{ aws_access_key }}"
-          aws_secret_key: "{{ aws_secret_key }}"  
-      register        : cluster_subnet_workers
-    
     - name: Fetching internet gateway id
       ec2_vpc_igw:
           region      : "{{ region }}"
@@ -109,14 +92,6 @@
           aws_secret_key: "{{ aws_secret_key }}"
       register          : sg
     
-#    - name: Allocate Elastic IP
-#      ec2_eip:
-#          region: "{{ region }}"
-#          in_vpc: true
-#          aws_access_key: "{{ aws_access_key }}"
-#          aws_secret_key: "{{ aws_secret_key }}"
-#      register: eip
-
     - name: Create one management instance in subnet
       ec2:
         key_name      : "{{ keypair }}"
@@ -134,6 +109,17 @@
         assign_public_ip: yes
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
+      register: manager
+
+    - name: Allocate Elastic IP
+      ec2_eip:
+          region    : "{{ region }}"
+#          in_vpc    : true
+          device_id : {{ manager.id }}
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+      register: eip
+
 
     - name: Create three instances for K8s control plane
       ec2:
@@ -169,6 +155,7 @@
         instance_tags :
             Name        : worker-{{ item }}
             Appointment : K8s_workers
+            POD_CIDR    : 10.200.{{ item }}.0/24
         assign_public_ip: yes
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"

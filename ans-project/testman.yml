@@ -1,0 +1,39 @@
+
+---
+- name: Create test instatnce
+  hosts: local
+  connection: local
+  gather_facts: false
+  vars_files     : cred.yml
+  vars:
+   keypair       : aws-key-london
+   instance_type : t2.micro
+   image         : ami-096cb92bb3580c759
+   region        : eu-west-2
+   count         : 3
+   security_group: KubeSecurityGroup
+   vpc           : Kubernetes-the-hard-way
+   az_a          : eu-west-2a
+
+  tasks:
+    - name: Create one management instance in subnet
+      ec2:
+        key_name      : "{{ keypair }}"
+        instance_type : "{{ instance_type }}"
+        image         : "{{ image }}"
+        wait          : true
+        group_id      : sg-0a693f1e4842c1e88
+        count         : 1
+        region        : "{{ region }}"
+        vpc_subnet_id : subnet-0f28202538948107d
+#        private_ip    : 10.240.0.201
+        instance_tags :
+            Name        : Manager1
+            Appointment : Cluster Manager
+        assign_public_ip: yes
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+      register: manager
+    
+    - name: Debug var manager
+      debug: msg="{{ manager.instances.id }}"

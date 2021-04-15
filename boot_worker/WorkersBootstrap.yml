@@ -1,0 +1,33 @@
+
+---
+
+- name: Bootstrapping the Kubernetes Worker Nodes
+  hosts: workers_servers
+  become: yes
+
+  tasks:
+    - name: Change hostname
+      shell: hostname {{ inventory_hostname }}
+
+    - name: Change /etc/hostname
+      shell: echo {{ inventory_hostname }} > /etc/hostname
+
+    - name: Copy BootstrapKWN.sh
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_worker/BootstrapKWN.sh
+        dest : /home/ubuntu/
+
+    - name: Copy credentials
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_worker/credentials
+        dest : /home/ubuntu/
+
+    - name: Copy config
+      copy:
+        src  : /home/ubuntu/kubernetes/boot_worker/config
+        dest : /home/ubuntu/
+
+    - name: Start BootstrapKWN.sh
+      shell: bash BootstrapKWN.sh {{ pod_cidr }} > WorkersBottstrap.log
+
+

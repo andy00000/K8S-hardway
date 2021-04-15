@@ -23,3 +23,5 @@ Doc 7 - Bootstrapping the etcd Cluster (/etcd/BootstrapETCDcm.sh - bash script f
 Doc 8 - Bootstrapping the Kubernetes Control Plane
         Provision the Kubernetes Control Plane (/boot_cntrl_panel/BootstrapKCP.sh - bash script for distribution, distribute and run - /boot_cntrl_panel/CopyBootstrapToCtrl.yml) 
         RBAC for Kubelet Authorization (/boot_cntrl_panel/RBAC.sh - bash script for distribution, distribute and run - /boot_cntrl_panel/RBAC_copy.yml)
+	Install and configure nginx load balancer to separate instance (/boot_cntrl_panel/nginx_install.sh - bash script for distribution, nginx.conf - confg file for balancer, balancer.yml - distribute bash and config)
+

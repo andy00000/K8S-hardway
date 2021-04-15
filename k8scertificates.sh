@@ -255,7 +255,7 @@ cfssl gencert \
 #echo -------------------------------------------------------------------------------------------------
 #echo
 
-KUBERNETES_PUBLIC_ADDRESS=$(aws ec2 describe-addresses --query 'Addresses[*].[PublicIp]' --output text)
+KUBERNETES_PUBLIC_ADDRESS=35.178.245.57                #$(aws ec2 describe-addresses --query 'Addresses[*].[PublicIp]' --output text)
 
 KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 
